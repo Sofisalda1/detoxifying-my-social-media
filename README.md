@@ -13,7 +13,7 @@ Data used is the [coffee quality dataset](https://github.com/jldbc/coffee-qualit
 
 ## Requirements:
 
-- pyenv with Python: 3.9.4
+- pyenv with Python: 3.9.8
 
 ### Setup
 
@@ -24,7 +24,7 @@ make setup
 
 #or
 
-pyenv local 3.9.4
+pyenv local 3.9.8
 python -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -53,7 +53,8 @@ The code in the [config.py](modeling/config.py) will try to read it locally and 
 
 ### Creating an MLFlow experiment
 
-You can do it via the GUI or via [command line](https://www.mlflow.org/docs/latest/tracking.html#managing-experiments-and-runs-with-the-tracking-service-api) if you use the local mlflow:
+You can do it via the GUI or via [command line](https://www.mlflow.org/docs/latest/tracking.
+html#managing-experiments-and-runs-with-the-tracking-service-api) if you use the local mlflow:
 
 ```bash
 mlflow experiments create --experiment-name 0-template-ds-modeling
