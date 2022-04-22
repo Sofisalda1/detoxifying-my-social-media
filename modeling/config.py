@@ -10,4 +10,4 @@ try:
 except:
     TRACKING_URI = parsenvy.str("MLFLOW_URI")
 
-EXPERIMENT_NAME = "0-template-ds-modeling"
+EXPERIMENT_NAME = "detox-team"
