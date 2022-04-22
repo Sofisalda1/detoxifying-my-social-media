@@ -8,7 +8,7 @@ import warnings
 import mlflow
 from mlflow.sklearn import save_model  # , log_model
 
-from modeling.feature_engineering import (
+from feature_engineering import (
     fill_missing_values,
     drop_column,
     transform_altitude,
@@ -17,7 +17,7 @@ from modeling.feature_engineering import (
     altitude_low_meters_mean,
 )
 
-from modeling.config import TRACKING_URI, EXPERIMENT_NAME
+from config import TRACKING_URI, EXPERIMENT_NAME
 
 warnings.filterwarnings("ignore")
 logger = getLogger(__name__)
