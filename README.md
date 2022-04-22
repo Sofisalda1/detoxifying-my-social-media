@@ -1,18 +1,3 @@
-# Project: Detoxifying my Social Media 
-
-# Objective
-<here objective>
-
-# The Data
-From kaggle:
-"The primary data for the competition is, in each provided file, the comment_text column. This contains the text of a comment which has been classified as toxic or non-toxic (0...1 in the toxic column). The train set’s comments are entirely in english and come either from Civil Comments or Wikipedia talk page edits. The test data's comment_text columns are composed of multiple non-English languages.
-
-The *-train.csv files and validation.csv file also contain a toxic column that is the target to be trained on.
-
-The jigsaw-toxic-comment-train.csv and jigsaw-unintended-bias-train.csv contain training data (comment_text and toxic) from the two previous Jigsaw competitions, as well as additional columns that you may find useful.
-
-*-seqlen128.csv files contain training, validation, and test data that has been processed for input into BERT."
-
 # ds-modeling-pipeline
 
 Here you find a Skeleton project for building a simple model in a python script or notebook and log the results on MLFlow.
@@ -51,13 +36,13 @@ The `requirements.txt` file contains the libraries needed for deployment.. of mo
 The MLFLOW URI should **not be stored on git**, you have two options, to save it locally in the `.mlflow_uri` file:
 
 ```BASH
-echo http://127.0.0.1:5000/ > .mlflow_uri
+echo https://hudsju377cddpoevnjdkfnvpwovniewnipcdsnkvn.mlflow.neuefische.de > .mlflow_uri
 ```
 
 This will create a local file where the uri is stored which will not be added on github (`.mlflow_uri` is in the `.gitignore` file). Alternatively you can export it as an environment variable with
 
 ```bash
-export MLFLOW_URI=http://127.0.0.1:5000/
+export MLFLOW_URI=https://hudsju377cddpoevnjdkfnvpwovniewnipcdsnkvn.mlflow.neuefische.de
 ```
 
 This links to your local mlflow, if you want to use a different one, then change the set uri.
@@ -68,8 +53,7 @@ The code in the [config.py](modeling/config.py) will try to read it locally and 
 
 ### Creating an MLFlow experiment
 
-You can do it via the GUI or via [command line](https://www.mlflow.org/docs/latest/tracking.
-html#managing-experiments-and-runs-with-the-tracking-service-api) if you use the local mlflow:
+You can do it via the GUI or via [command line](https://www.mlflow.org/docs/latest/tracking.html#managing-experiments-and-runs-with-the-tracking-service-api) if you use the local mlflow:
 
 ```bash
 mlflow experiments create --experiment-name 0-template-ds-modeling
