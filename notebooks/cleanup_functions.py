@@ -70,3 +70,6 @@ def remove_emojis(df, column):
 def handle_nontext(panda_column):
     return panda_column.apply(lambda x: x.encode("utf-8"))
 
+def remove_markups(panda_text_column):
+    return panda_text_column.apply(lambda x: x.replace('\n', ' '))
+
