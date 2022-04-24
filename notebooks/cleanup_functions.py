@@ -1,7 +1,8 @@
 import pandas as pd
 import demoji
 import re
-
+from textblob import TextBlob
+import tqdm
 
 def remove_doublequotation(panda_text_column):
     return panda_text_column.apply(lambda x: x.replace('"', ''))
@@ -41,7 +42,6 @@ def interpolate_apostrophes_column(panda_text_column):
     return panda_text_column.apply(lambda x: interpolate_apostrophes_string(x))
 
 def correct_spelling(panda_text_column):
-    from textblob import TextBlob
     return panda_text_column.apply(lambda x: TextBlob(x).correct())
 
 def process_URLs_individual(text):
@@ -52,7 +52,6 @@ def process_URLs(panda_text_column):
     return panda_text_column.apply(lambda x: process_URLs_individual(x))
 ## emojis
 # get dictionary of emojis
-demoji.download_codes()
 def get_emojis(panda_text_column):
     dict = {}
     for row in panda_text_column:
@@ -68,8 +67,13 @@ def remove_emojis(df, column):
     return df_copy
 
 def handle_nontext(panda_column):
-    return panda_column.apply(lambda x: x.encode("utf-8"))
+    return panda_column.apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
 
 def remove_markups(panda_text_column):
     return panda_text_column.apply(lambda x: x.replace('\n', ' '))
 
+def remove_patterns_string(text):
+    pattern = re.compile(r"(.)\1{2,}", re.DOTALL)
+    return pattern.sub(r"\1", text)
+def remove_repetitions(panda_text_column):
+    return panda_text_column.apply(lambda x: remove_patterns_string(x))

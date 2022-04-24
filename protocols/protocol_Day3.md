@@ -1,7 +1,7 @@
 
 <span style="color:grey">
 
-# Day 3, 21.04.2022
+# Day 3 and 4, 21. - 22.04.2022
 
 ## Set Up
 
@@ -21,16 +21,19 @@
     * find index in data of cursewords
 * Problem: too many unique words. We need to to clean the data first.
 
-#### Preprocessing
+#### Cleanup
 * Removing markup elements, e.g. /n (: soup = BeautifulSoup(markup))
 * Handling non-text data (Text = text.encode("utf-8"))
 * Handling apostrophes ('re' --> 'are')
     * We need to add to more apostrophe words (minuscule, capital letters)
-    
 * Handling emojis with Demoji module
-
 * Split-joined words
-
 * Removal of URLs
 
 * Nonstandard spellings
+    * takes too many hours
+
+
+### Open questions
+* Do we need to get rid of numbers?
+* Is there an efficient spell correction?
