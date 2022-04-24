@@ -59,7 +59,7 @@
     * Removing markup elements, e.g. /n (: soup = BeautifulSoup(markup))
     * Handling non-text data (Text = text.encode("utf-8"))
     * Handling apostrophes (manually)
-    Handling emojis with Demoji module
+    * Handling emojis with Demoji module
     * Split-joined words
     * Removal of URLs
     * Nonstandard spellings
