@@ -54,8 +54,6 @@ for i in tqdm(range(100)):
 # for i in tqdm(range(1)):
 #     df['comment_text'] = correct_spelling(df['comment_text'])
 # #print('(7/7) Handling remaining non-text')    
-#for i in tqdm(range(20)):
-#    df["comment_text"] = handle_nontext(df["comment_text"] )# then bytes make it diffcult to deal with data
 
 
 ##################################
