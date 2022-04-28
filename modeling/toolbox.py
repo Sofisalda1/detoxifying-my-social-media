@@ -18,15 +18,15 @@ warnings.filterwarnings('ignore')
 
 
 
-def nlp_preprocess(X, vectorizer, word_generalization, min_df=1, stop_words={}, ngram=1, lowercase=True):
+def nlp_preprocess(X, tokenizer, vectorizer, word_generalization, min_df=1, stop_words={}, ngram=1, lowercase=True):
     # Fit the CountVectorizer to the training data
     print('Vectorizing and Tokenizing...')
-    analyzer = vectorizer(min_df=min_df, 
-                            ngram_range=(1,ngram), stop_words=stop_words, 
-                            lowercase=lowercase).build_analyzer()
+    analyzer = vectorizer().build_analyzer()
     def change_word(doc):
         return (word_generalization(t) for t in analyzer(doc))
-    vect = vectorizer(analyzer=change_word)
+    vect = vectorizer(analyzer=change_word, tokenizer=tokenizer, min_df=min_df, 
+                            ngram_range=(1,ngram), stop_words=stop_words, 
+                            lowercase=lowercase)
     X_vect = vect.fit_transform(X)
     print('Done!')
     return X_vect, vect
@@ -34,7 +34,7 @@ def nlp_preprocess(X, vectorizer, word_generalization, min_df=1, stop_words={}, 
 def fit_nlp(X, Y, ml_model):
 
     # Creating classifiers with default parameters initially.
-    clf = ml_model()
+    clf = ml_model
 
 
     # Calculating the cross validation F1 and Recall score for our 3 baseline models.

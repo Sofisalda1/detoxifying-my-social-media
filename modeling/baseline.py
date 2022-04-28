@@ -24,8 +24,8 @@ def __get_data():
     train = pd.read_csv("./data/" + DATA_NAME + ".csv")
 
     # cleaning data and preparing
-    Y = train["toxic"][:50000]
-    X = train["comment_text"][:50000]
+    Y = train["toxic"]
+    X = train["comment_text"]
     return X,Y, DATA_NAME
 
 
@@ -45,7 +45,7 @@ def run_baseline():
         def lemmatize_word(doc):
             return (WNlemma.lemmatize(t) for t in analyzer(doc))
 
-        lemm_vectorizer = CountVectorizer(min_df=15, analyzer=lemmatize_word)
+        lemm_vectorizer = CountVectorizer(min_df=20, analyzer=lemmatize_word)
         X_vect = lemm_vectorizer.fit_transform(X)
         mlflow.log_params({"Vectorizer": "Count", "Word_Summary": 'lemmatization'})
         lenvoc =  len(lemm_vectorizer.vocabulary_)
@@ -90,3 +90,5 @@ if __name__ == "__main__":
 
     run_baseline()
 
+
+# %%
