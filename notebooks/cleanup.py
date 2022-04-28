@@ -1,13 +1,15 @@
 # import packages
 import pandas as pd
-import demoji
+#import demoji
 import re
 from cleanup_functions import *
-from tqdm import tqdm
+#from tqdm import tqdm
 import warnings
-import numpy as np
+#import numpy as np
 warnings.filterwarnings("ignore")
 import string
+
+
 ##################################
 # import data
 ##################################
@@ -19,7 +21,7 @@ df=pd.read_csv("./data/"+INPUT_NAME+ ".csv")
 ##################################
 # cleanup
 ##################################
-print('(1/8) Removing double quotations')
+''' print('(1/8) Removing double quotations')
 for i in tqdm(range(1)):
     df['comment_text'] = remove_doublequotation(df['comment_text'])
 print('(2/8) Interpolating Apostrophies')    
@@ -56,7 +58,27 @@ for i in tqdm(range(20)):
 # for i in tqdm(range(1)):
 #     df['comment_text'] = correct_spelling(df['comment_text'])
 # #print('(7/7) Handling remaining non-text')    
+'''
 
+
+#########################################
+# Additional Cleaning
+#########################################
+# non text
+train["comment_text"]  = train["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
+test["comment_text"]  = test["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
+
+# numbers
+train["comment_text"]  = train["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
+test["comment_text"]  = test["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
+
+# Stock market tickers $GE
+train["comment_text"]  = train["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
+test["comment_text"]  = test["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
+
+# remove hashtags
+train["comment_text"]  = train["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
+test["comment_text"]  = test["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
 
 ##################################
 # optional: show emojis in corpus
@@ -68,3 +90,4 @@ for i in tqdm(range(20)):
 ##################################
 #df.to_csv("./data/"+INPUT_NAME+'_clean.csv', index=False)
 df.to_csv("./data/"+INPUT_NAME+'_pre_clean.csv', index=False)
+
