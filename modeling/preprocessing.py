@@ -5,10 +5,12 @@
 # # import modules
 #########################################
 import pandas as pd
+
 import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 from toolbox import *
+
 import mlflow
 
 
@@ -38,6 +40,7 @@ stop_words = 'english' # {} 'english'
 WNlemma = nltk.WordNetLemmatizer()
 stemmer = nltk.PorterStemmer()
 
+
 ngram = 1 # 1, 2
 lowercase = False # True, False
 tokenizer = tweettokenizer
@@ -48,6 +51,7 @@ word_generalization = WNlemma.lemmatize # stemmer.stem WNlemma.lemmatize
 #########################################
 # preprocess and fit models
 #########################################
+
 
 def run_preprocessing():
     min_df = 20 # 1 20
@@ -87,3 +91,4 @@ if __name__ == "__main__":
 
     run_preprocessing()
         
+
