@@ -1,61 +1,52 @@
+
+
+#%%
 #########################################
 # # import modules
 #########################################
 import pandas as pd
-import numpy as np
-import re
-import string
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.corpus import stopwords
-from timeit import default_timer as timer
+#import numpy as np
+#import statistics
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+#import re
+#import string
+#from timeit import default_timer as timer
 
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import LinearSVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
+#from sklearn.svm import LinearSVC
+#from sklearn.tree import DecisionTreeClassifier
+#from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, GradientBoostingClassifier, VotingClassifier, RandomForestClassifier
 
-from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score, roc_auc_score, roc_curve
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import fbeta_score
-from statistics import mean
-from sklearn.metrics import hamming_loss
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import ShuffleSplit
-from sklearn.model_selection import learning_curve
+#from sklearn.pipeline import Pipeline
+#from sklearn.metrics import roc_auc_score, roc_curve, confusion_matrix, hamming_loss, fbeta_score
+from sklearn.model_selection import cross_val_score#, StratifiedKFold, GridSearchCV, ShuffleSplit, learning_curve
+from sklearn.feature_extraction.text import CountVectorizer#, TfidfVectorizer
 
-from sklearn.metrics import roc_auc_score, confusion_matrix
-import statistics
-from sklearn.metrics import recall_score
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+import nltk 
+from nltk.tokenize import TweetTokenizer
+from nltk.corpus import stopwords
+#from nltk.stem.wordnet import WordNetLemmatizer
 
-from wordcloud import WordCloud
-from collections import Counter
+#from wordcloud import WordCloud
+#from collections import Counter
 
-from sklearn.pipeline import Pipeline
-
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import BaggingClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import VotingClassifier
-#import xgboost as xgb
 import warnings
 warnings.filterwarnings('ignore')
 from utils import *
-import nltk 
-from nltk.tokenize import TweetTokenizer
+import mlflow
 
 
+#%%
+from config import TRACKING_URI, EXPERIMENT_NAME
+mlflow.set_tracking_uri(TRACKING_URI)
+mlflow.set_experiment(EXPERIMENT_NAME)
+
+#%%
 #########################################
 # define functions
 #########################################
-
+nltk.download('stopwords')
 stopwords_english = stopwords.words('english')
 
 # Tokenizer
@@ -86,10 +77,12 @@ def nlp_preprocess(X, tokenizer, vectorizer, word_generalization, min_df=1, stop
     return X_vect
 
 def fit_nlp(X, Y):
+
     # Creating classifiers with default parameters initially.
     clf1 = MultinomialNB()
     clf2 = LogisticRegression()
-    clf3 = LinearSVC()
+    #clf3 = LinearSVC()
+
     # Calculating the cross validation F1 and Recall score for our 3 baseline models.
     print('Fitting MultinomialNB...')
     methods1_cv = pd.DataFrame(cross_validation_score(clf1, X_vect, Y))
@@ -124,31 +117,13 @@ def cross_validation_score(classifier, X_train, y_train):
 
     return methods
 
+#%%
 #########################################
 # import data
 #########################################
 train = pd.read_csv("./data/train_wikipedia_pre_clean.csv")
 test = pd.read_csv("./data/test_wikipedia_pre_clean.csv")
 test_y = pd.read_csv("./data/test_labels_wikipedia_pre_clean.csv")
-
-#########################################
-# Additional Cleaning
-#########################################
-# non text
-train["comment_text"]  = train["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
-
-# numbers
-train["comment_text"]  = train["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
-
-# Stock market tickers $GE
-train["comment_text"]  = train["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
-
-# remove hashtags
-train["comment_text"]  = train["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
 
 
 #########################################
@@ -158,7 +133,6 @@ X = train["comment_text"]
 Y = train['toxic']
 X_test = test["comment_text"]
 #Y_test = test['toxic']
-
 
 
 #########################################
@@ -172,10 +146,10 @@ tokenizer = tweettokenizer
 vectorizer = CountVectorizer # TfidfVectorizer CountVectorizer
 word_generalization = WNlemma.lemmatize # stemmer.stem WNlemma.lemmatize
 
+#%%
 #########################################
 # preprocess and fit models
 #########################################
-
 
 # preprocess
 X_vect = nlp_preprocess(X, tokenizer, vectorizer, word_generalization, min_df, stop_words, ngram, lowercase)
