@@ -3,9 +3,9 @@ import pandas as pd
 #import demoji
 import re
 from cleanup_functions import *
-#from tqdm import tqdm
+from tqdm import tqdm
 import warnings
-#import numpy as np
+import numpy as np
 warnings.filterwarnings("ignore")
 import string
 
@@ -13,9 +13,9 @@ import string
 ##################################
 # import data
 ##################################
-INPUT_NAME='test_wikipedia'
+INPUT_NAME='train_wikipedia'
 #INPUT_NAME='train_civil'
-df=pd.read_csv("./data/"+INPUT_NAME+ ".csv")
+df=pd.read_csv("./data/"+INPUT_NAME+ "_pre_clean.csv")
 
 
 ##################################
@@ -65,29 +65,31 @@ for i in tqdm(range(20)):
 # Additional Cleaning
 #########################################
 # non text
-train["comment_text"]  = train["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
+df["comment_text"]  = df["comment_text"] .apply(lambda x: x.encode("latin-1","ignore").decode('ISO-8859-1'))
 
 # numbers
-train["comment_text"]  = train["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
+df["comment_text"]  = df["comment_text"] .apply(lambda x: x.encode("ascii","ignore").decode('ISO-8859-1'))
 
 # Stock market tickers $GE
-train["comment_text"]  = train["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
+df["comment_text"]  = df["comment_text"] .apply(lambda x: re.sub(r'\$\w*', '', x))
 
 # remove hashtags
-train["comment_text"]  = train["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
-test["comment_text"]  = test["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
+df["comment_text"]  = df["comment_text"] .apply(lambda x: re.sub(r'#', '', x))
+
+#nas
+print('(8/8) Removing empty rows')
+for i in tqdm(range(20)):
+     df = df.replace('', np.nan).dropna(subset=['comment_text'])
 
 ##################################
 # optional: show emojis in corpus
 ##################################
 #x = get_emojis(df_wikipedia['comment_text'][:1000])
 
+
+
 ##################################
 # save
 ##################################
 #df.to_csv("./data/"+INPUT_NAME+'_clean.csv', index=False)
 df.to_csv("./data/"+INPUT_NAME+'_pre_clean.csv', index=False)
-
