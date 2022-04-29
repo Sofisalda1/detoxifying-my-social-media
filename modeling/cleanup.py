@@ -16,7 +16,7 @@ import string
 # import data
 ##################################
 
-INPUT_NAME='test_wikipedia'
+INPUT_NAME='train_wikipedia'
 #INPUT_NAME='train_civil'
 df=pd.read_csv("./data/"+INPUT_NAME+ "_pre_clean.csv")
 
