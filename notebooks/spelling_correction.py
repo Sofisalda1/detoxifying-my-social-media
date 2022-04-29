@@ -3,6 +3,7 @@ import re
 from tqdm import tqdm
 from spellchecker import SpellChecker
 from wordsegment import load, segment
+spell = SpellChecker()
 load()
 start=0
 finish=1000
@@ -22,7 +23,6 @@ X  = X.apply(lambda x: re.sub(r'#', '', x))
 
 
 def correct(x):
-    spell = SpellChecker()
     misspelled = spell.unknown(x.split())
     for w in misspelled:
         return [w, spell.correction(w), list(spell.candidates(w)), segment(w)]
@@ -42,5 +42,8 @@ for i,text in enumerate(X):
 
 df = pd.DataFrame(misspellings, columns = ['row', 'word', 'corrected', 'suggestions', 'segment suggestion'])
 
-df.to_csv('./data/train_spelling_correction'+ str(start) + '.csv')
+df.to_csv('./data/train_spelling_correction'+ str(end) + '.csv')
 #df.to_csv('../data/test_spelling_correction.csv')
+
+##### correct
+df["text"].apply(lambda x: " ".join(word_suggest(word) for word in word_tokenize(x)))
