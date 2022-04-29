@@ -12,6 +12,7 @@ import nltk
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
+from sklearn.metrics import precision_score, roc_auc_score
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -25,26 +26,35 @@ def nlp_preprocess(X, tokenizer, vectorizer, word_generalization, min_df=1, stop
     def change_word(doc):
         return (word_generalization(t) for t in analyzer(doc))
     vect = vectorizer(analyzer=change_word, tokenizer=tokenizer, min_df=min_df, 
-                            ngram_range=(1,ngram), stop_words=stop_words, 
+                            ngram_range=(ngram,ngram), stop_words=stop_words, 
                             lowercase=lowercase)
     X_vect = vect.fit_transform(X)
     print('Done!')
     return X_vect, vect
 
-def fit_nlp(X, Y, ml_model):
+def fit_nlp(X, Y, X_test, Y_test, ml_model):
+    results = pd.DataFrame(columns = ['Precision_Train', 'ROC_Train', 'Precision_Test', 'ROC_Test'], index=range(1))
 
     # Creating classifiers with default parameters initially.
     clf = ml_model
-
-
     # Calculating the cross validation F1 and Recall score for our 3 baseline models.
     print('Fitting Model...')
-    methods_cv = pd.DataFrame(cross_validation_score(clf, X, Y))
-
-    # Creating a dataframe to show summary of results.
-    methods_cv.columns = ['Model', 'Precision', 'ROC']
-    meth_cv = methods_cv.reset_index()
-    return methods_cv.Precision, methods_cv.ROC
+    # get performance of train data
+    ml_model.fit(X, Y)
+    predicted_train = ml_model.predict(X)
+    results.Precision_Train = precision_score(Y,predicted_train, average="weighted")
+    results.ROC_Train = roc_auc_score(Y,predicted_train,average="weighted")
+    # get performance of test data
+    predict_df = pd.DataFrame()
+    predicted_test = ml_model.predict(X_test)
+    predict_df["toxic"] = predicted_test
+    results.Precision_Test = precision_score(Y_test[Y_test != -1],
+                        predicted_test[Y_test != -1],
+                        average="weighted")
+    results.ROC_Test = roc_auc_score(Y_test[Y_test != -1],
+                        predicted_test[Y_test != -1],
+                average="weighted")
+    return results
 
 
 def cross_validation_score(classifier, X_train, y_train):

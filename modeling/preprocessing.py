@@ -23,26 +23,28 @@ mlflow.set_experiment(EXPERIMENT_NAME)
 
 #%%
 def __get_data():
-    DATA_NAME = 'train_wikipedia_pre_clean'
-    train = pd.read_csv("./data/" + DATA_NAME + ".csv")
-
+    DATA_NAME = 'wikipedia_pre_clean'
+    train = pd.read_csv("./data/train_" + DATA_NAME + ".csv")
+    test = pd.read_csv("./data/test_" + DATA_NAME + ".csv")
     # cleaning data and preparing
     Y = train["toxic"]
     X = train["comment_text"]
-    return X,Y, DATA_NAME
+    Y_test = test["toxic"]
+    X_test= test["comment_text"]
+    return X,Y, X_test, Y_test, DATA_NAME
 
 
 #########################################
 # set parameters
 #########################################
 
-min_df = 20 # 1 20
+min_df = 6 # 1 20
 stop_words = 'english' # {} 'english'
 ngram = 1 # 1, 2
-lowercase = True # True, False
-tokenizer = tweettokenizer
-vectorizer = CountVectorizer # TfidfVectorizer CountVectorizer
-word_generalization = stemmer.stem # stemmer.stem WNlemma.lemmati
+lowercase = False # True, False
+tokenizer = nltk.word_tokenize #tweettokenizer
+vectorizer = TfidfVectorizer # TfidfVectorizer CountVectorizer
+word_generalization = WNlemma.lemmatize # stemmer.stem WNlemma.lemmati
 model = LogisticRegression()
 
 #%%
@@ -52,7 +54,7 @@ model = LogisticRegression()
 
 
 def run_preprocessing():
-    X, Y, DATA_NAME = __get_data()
+    X, Y, X_test, Y_test, DATA_NAME = __get_data()
     logger.info("Preprocessing Data")
     mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment(EXPERIMENT_NAME)
@@ -63,10 +65,13 @@ def run_preprocessing():
                         "Vectorizer": vectorizer, "Word_Summary": word_generalization, "ml_model": model})
 
         X_preproc, vect = nlp_preprocess(X, tokenizer,vectorizer, word_generalization, min_df, stop_words, ngram, lowercase)
+        X_test_preproc = vect.transform(X_test)
         mlflow.log_params({"Vocabulary": len(vect.vocabulary_)})
-        Precision, ROC = fit_nlp(X_preproc, Y, model)
-        mlflow.log_metric("Precision", Precision)
-        mlflow.log_metric("ROC", ROC)
+        eval = fit_nlp(X_preproc, Y, X_test_preproc, Y_test, model)
+        mlflow.log_metric("Precision Train", eval.Precision_Train[0])
+        mlflow.log_metric("ROC Train", eval.ROC_Train[0])
+        mlflow.log_metric("Precision Test", eval.Precision_Test[0])
+        mlflow.log_metric("ROC Test", eval.ROC_Test[0])
 
 
 if __name__ == "__main__":
