@@ -77,3 +77,21 @@ def remove_patterns_string(text):
     return pattern.sub(r"\1", text)
 def remove_repetitions(panda_text_column):
     return panda_text_column.apply(lambda x: remove_patterns_string(x))
+
+#normalizing abreviations
+Abreviation_expansion = {
+"LOL": "LAUGH OUT LOUD","lol": "laugh out loud", "fml": "fuck my life", 
+"FML": "FUCK MY LIFE", "ASAP": "AS SOON AS POSSIBLE","asap": "as soon as possible",
+"FYI": "FOR YOUR INFORMATION", "fyi": "for your information", "G2G": "GOT TO GO",
+"g2g": "got to go","IMO": "IN MY OPINION","imo": "in my opinion",
+"IDC": "I DO NOT CARE","idc": "i do not care","idgaf": "i do not give a fuck",
+"IDGAF": "I DO NOT GIVE A FUCK", "There's": "There is", "THERE'S": "THERE IS",
+"imho": "in my honest opinion", "btw": "by the way", "WTF": "WHAT THE FUCK",
+"wtf": "what the fuck"
+} 
+def interpolate_abrev_string(string):
+    for abrev, expanded in Abreviation_expansion.items():
+        return string.replace(abrev, expanded)
+
+def interpolate_abrev_column(panda_text_column):
+    return panda_text_column.apply(lambda x: interpolate_abrev_string(x))
