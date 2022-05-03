@@ -2,13 +2,16 @@ import pandas as pd
 import demoji
 import re
 from textblob import TextBlob
-import tqdm
-
+from spellchecker import SpellChecker
+from wordsegment import load, segment
+spell = SpellChecker()
+load()
 def remove_doublequotation(panda_text_column):
-    return panda_text_column.apply(lambda x: x.replace('"', ''))
+    return panda_text_column.apply(lambda x: x.replace('\"', ''))
 Apostrophes_expansion = {
 "i'm": "i am","I'm": "I am", "I'M": "I AM", 
 "i'd": "i would", "I'd": "I would","I'D": "I WOULD",
+"i'll": 'i will', "I'll": "I will", "I'LL": "I Will",
 "you're": "you are", "You're": "You are", "YOU'RE": "YOU ARE",
 "he's": "he is","He's": "He is","HE'S": "HE IS",
 "she's": "she is","She's": "She is","SHE'S": "SHE IS",
@@ -35,6 +38,7 @@ Apostrophes_expansion = {
 "here's": "here is", "Here's": "Here is", "HERE'S": "HERE IS",
 "let's": 'let us', "Let's": "Let us", "LET'S": "LET US"
 } 
+
 def interpolate_apostrophes_string(string):
     x = string.split(' ')
     return " ".join([Apostrophes_expansion[word] if word in Apostrophes_expansion else word for word in x])
@@ -87,7 +91,8 @@ Abreviation_expansion = {
 "IDC": "I DO NOT CARE","idc": "i do not care","idgaf": "i do not give a fuck",
 "IDGAF": "I DO NOT GIVE A FUCK", "There's": "There is", "THERE'S": "THERE IS",
 "imho": "in my honest opinion", "btw": "by the way", "WTF": "WHAT THE FUCK",
-"wtf": "what the fuck"
+"wtf": "what the fuck", 
+'omg' : 'oh my god', 'OMG': 'OH MY GOD'
 } 
 def interpolate_abrev_string(string):
     for abrev, expanded in Abreviation_expansion.items():
@@ -95,3 +100,17 @@ def interpolate_abrev_string(string):
 
 def interpolate_abrev_column(panda_text_column):
     return panda_text_column.apply(lambda x: interpolate_abrev_string(x))
+
+def replace_abbreviation(text):
+    x = text.split(' ')
+    return " ".join([Abreviation_expansion[word] if word in Abreviation_expansion else word for word in x])
+
+def word_separator(text):
+    misspelled = spell.unknown(text.split())
+    if misspelled: 
+        return " ".join([" ".join(segment(word)) for word in text.split()])
+    else: 
+        return text
+
+def word_separator2(text):
+    return " ".join([" ".join(segment(word)) for word in text.split()])
