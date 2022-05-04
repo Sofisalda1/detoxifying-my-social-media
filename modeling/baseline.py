@@ -16,22 +16,20 @@ WNlemma = nltk.WordNetLemmatizer()
 
 
 def __get_data():
-    #logger.info("Getting the data")
-    #########################################
-    # import data
-    #########################################
-    DATA_NAME = 'train_wikipedia_pre_clean'
-    train = pd.read_csv("./data/" + DATA_NAME + ".csv")
-
+    DATA_NAME = 'wikipedia_pre_clean'
+    train = pd.read_csv("./data/train_" + DATA_NAME + ".csv")
+    test = pd.read_csv("./data/test_" + DATA_NAME + ".csv")
     # cleaning data and preparing
     Y = train["toxic"]
     X = train["comment_text"]
-    return X,Y, DATA_NAME
+    Y_test = test["toxic"]
+    X_test= test["comment_text"]
+    return X,Y, X_test, Y_test, DATA_NAME
 
 
 
 def run_baseline():
-    X, Y,DATA_NAME = __get_data()
+    X, Y, X_test, Y_test, DATA_NAME = __get_data()
     logger.info("Calculating Baseline Model")
     mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment(EXPERIMENT_NAME)
@@ -45,47 +43,47 @@ def run_baseline():
         def lemmatize_word(doc):
             return (WNlemma.lemmatize(t) for t in analyzer(doc))
 
-        lemm_vectorizer = CountVectorizer(min_df=20, analyzer=lemmatize_word)
-        X_vect = lemm_vectorizer.fit_transform(X)
+        vect = CountVectorizer(min_df=20, analyzer=lemmatize_word)
+        X_vect = vect.fit_transform(X)
+        X_vect_test = vect.transform(X_test)
+
         mlflow.log_params({"Vectorizer": "Count", "Word_Summary": 'lemmatization'})
-        lenvoc =  len(lemm_vectorizer.vocabulary_)
+        lenvoc =  len(vect.vocabulary_)
         logger.info(lenvoc)
         mlflow.log_params({'Vocabulary':lenvoc})
-
-
-        # get toxic words
-
-        model = LogisticRegression(max_iter=1500)
-        model.fit(X_vect, Y)
-        # get the feature names as numpy array
-        feature_names = np.array(lemm_vectorizer.get_feature_names_out())
-        # Sort the coefficients from the model (from lowest to highest values)
-        sorted_coef_index = model.coef_[0].argsort()
-        toxic_words_raw = feature_names[sorted_coef_index[:-300:-1]]
-        spell = SpellChecker()
-        correct_words = spell.known(toxic_words_raw)
-        toxic_words = list(correct_words)
         logger.info('Transforming to array')
         X_array = X_vect.toarray()
-        df_occurrence = pd.DataFrame(data=X_array,columns = lemm_vectorizer.get_feature_names_out())
+        #X_array_t = X_vect_test.toarray()
+
+        df_occurrence = pd.DataFrame(data=X_array,columns = vect.get_feature_names_out())
+        #df_occurrence_test = pd.DataFrame(data=X_array_t,columns = vect.get_feature_names_out())
         
-        #words_in_corpus = lemm_vectorizer.get_feature_names_out()
-        ## only keep those words that are in corpus
-        #toxic_index = [i for i, curse_word in enumerate(toxic_words) if curse_word in words_in_corpus]
-        #toxic_words = [toxic_words[i] for i in toxic_index]
-        
-        #logger.info('Calculating Score')
-        pred = sum(df_occurrence[insult] for insult in toxic_words) > 0
-        eval = roc_auc_score(Y, pred)
-        #mlflow.log_metric(eval)
-        mlflow.log_metric("ROC", eval)
+
+        # get toxic words
+        logger.info('Calculating Score')
+        toxic_words = ['fuck','fucking','shit','stupid','suck','bitch','ass','gay','dick','idiot','asshole',
+                        'hell','cunt','faggot','hate','penis','sucks','cock','fag','crap','dumb','fat','nigger',
+                        'bastard','bullshit','damn','moron','fucker','loser','idiots','fuckin','nazi','motherfucker','pussy','jerk','retard']
+        words_in_corpus = vect.get_feature_names_out()
+        df_baseline_voc = pd.DataFrame(words_in_corpus, columns=['word'])
+        df_baseline_voc.to_csv('./data/baselinvoc.csv')
+        # # only keep those words that are in corpus
+        toxic_index = [i for i, curse_word in enumerate(toxic_words) if curse_word in words_in_corpus]
+        toxic_words = [toxic_words[i] for i in toxic_index]
+
+        pred_train = sum(df_occurrence[insult] for insult in toxic_words) > 0
+        ROC_train = roc_auc_score(Y, pred_train)
+        #pred_test = sum(df_occurrence_test[insult] for insult in toxic_words) > 0
+        #ROC_test = roc_auc_score(Y_test, pred_test)
+        mlflow.log_metric("ROC Train", ROC_train)
+        #mlflow.log_metric("ROC Test", ROC_test)        
 
 if __name__ == "__main__":
     import logging
 
     logger = logging.getLogger()
     logging.basicConfig(format="%(asctime)s: %(message)s")
-    logging.getLogger("pyhive").setLevel(logging.CRITICAL)  # avoid excessive logs
+    #logging.getLogger("pyhive").setLevel(logging.CRITICAL)  # avoid excessive logs
     logger.setLevel(logging.INFO)
 
     run_baseline()
