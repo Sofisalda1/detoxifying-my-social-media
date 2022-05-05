@@ -4,7 +4,7 @@ import numpy as np
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
-
+from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
@@ -26,7 +26,7 @@ def nlp_preprocess(X, tokenizer, vectorizer, word_generalization, min_df=1, stop
     def change_word(doc):
         return (word_generalization(t) for t in analyzer(doc))
     vect = vectorizer(analyzer=change_word, tokenizer=tokenizer, min_df=min_df, 
-                            ngram_range=(ngram,ngram), stop_words=stop_words, 
+                            ngram_range=ngram, stop_words=stop_words, 
                             lowercase=lowercase)
     X_vect = vect.fit_transform(X)
     print('Done!')
@@ -42,35 +42,19 @@ def fit_nlp(X, Y, X_test, Y_test, ml_model):
     # get performance of train data
     ml_model.fit(X, Y)
     predicted_train = ml_model.predict(X)
-    results.Precision_Train = precision_score(Y,predicted_train, average="weighted")
-    results.ROC_Train = roc_auc_score(Y,predicted_train,average="weighted")
+    results.Precision_Train = cross_val_score(ml_model, X, Y, cv=10, scoring='precision').mean()
+    results.ROC_Train = cross_val_score(ml_model, X, Y, cv=10, scoring='roc_auc').mean()
     # get performance of test data
     predict_df = pd.DataFrame()
     predicted_test = ml_model.predict(X_test)
     predict_df["toxic"] = predicted_test
     results.Precision_Test = precision_score(Y_test[Y_test != -1],
-                        predicted_test[Y_test != -1],
-                        average="weighted")
+                         predicted_test[Y_test != -1],
+                         average="weighted")
     results.ROC_Test = roc_auc_score(Y_test[Y_test != -1],
                         predicted_test[Y_test != -1],
                 average="weighted")
     return results
-
-
-def cross_validation_score(classifier, X_train, y_train):
-    '''
-    Iterate though each label and return the cross validation F1 and Recall score 
-    '''
-    methods = []
-    name = classifier.__class__.__name__.split('.')[-1]
-    precision = cross_val_score(classifier, X_train,
-                        y_train, cv=10, scoring='precision')
-    roc = cross_val_score(classifier, X_train,
-                        y_train, cv=10, scoring='roc_auc')
-    methods.append([name, precision.mean(), roc.mean()])
-
-    return methods
-
 
 
 # Tokenizer

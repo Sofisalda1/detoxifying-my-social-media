@@ -38,15 +38,15 @@ def __get_data():
 # set parameters
 #########################################
 
-min_df = 6 # 1 20
+min_df = 3 # 1 20
 stop_words = 'english' # {} 'english'
-ngram = 1 # 1, 2
+ngram = (2,6)# 1, 2
 lowercase = False # True, False
-tokenizer = nltk.word_tokenize #tweettokenizer
+tokenizer = None #nltk.word_tokenize #tweettokenizer
 vectorizer = TfidfVectorizer # TfidfVectorizer CountVectorizer
-word_generalization = WNlemma.lemmatize # stemmer.stem WNlemma.lemmati
-model = LogisticRegression()
-
+word_generalization = None # WNlemma.lemmatize # stemmer.stem WNlemma.lemmati
+model = SVC() #LogisticRegression() # MultinomialNB() #SVM()
+#max_features=50000
 #%%
 #########################################
 # preprocess and fit models
@@ -63,8 +63,19 @@ def run_preprocessing():
         mlflow.log_params({"Min Occurrence": min_df,"Stop Words": stop_words,
                         "Ngram": ngram, "Lowercase": lowercase, "Tokenizer": tokenizer,
                         "Vectorizer": vectorizer, "Word_Summary": word_generalization, "ml_model": model})
+        vect = vectorizer(
+            analyzer='char',
+            min_df = min_df,
+            stop_words= stop_words,
+            sublinear_tf=True,
+            strip_accents='unicode',
+            ngram_range=ngram)
+        X_preproc = vect.fit_transform(X)
 
-        X_preproc, vect = nlp_preprocess(X, tokenizer,vectorizer, word_generalization, min_df, stop_words, ngram, lowercase)
+
+        #X_preproc, vect = nlp_preprocess(X, tokenizer,vectorizer, word_generalization, min_df, stop_words, ngram, lowercase)
+        
+        
         X_test_preproc = vect.transform(X_test)
         mlflow.log_params({"Vocabulary": len(vect.vocabulary_)})
         eval = fit_nlp(X_preproc, Y, X_test_preproc, Y_test, model)
