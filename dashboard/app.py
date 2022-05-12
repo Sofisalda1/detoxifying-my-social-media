@@ -4,26 +4,28 @@ from dash import html
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 import pickle
+#import tensorflow as tf
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import dash_bootstrap_components as dbc
-
+import os
 
 ################################################################################
 # APP INITIALIZATION
 ################################################################################
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.VAPOR]) # Superhero VAPOR
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO]) # Superhero VAPOR
 
 # this is needed by gunicorn command in procfile
 server = app.server
 
+################################################################################
+# PLOTS
+################################################################################
+
+
 
 # ################################################################################
-# # PLOTS
+# # LAYOUT
 # ################################################################################
-
-################################################################################
-# LAYOUT
-################################################################################
 app.layout = html.Div([
         html.H2(
             id="title",
@@ -36,21 +38,18 @@ app.layout = html.Div([
         dcc.Textarea(
             id="my-input",
             value="",
-            style={"width": "100%", "height": 100, "background-color":'cyan'},
+            style={"width": "100%", "height": 100, "background-color":'#ADD8E6'},
         ),
     html.Br(),
     html.Button(
         "Detect Toxicity", 
         id="submit-button-state", 
         n_clicks=0,
-        style={"background-color":"#FF5A36", "justify":"right"}
+        style={"background-color":"#FF5A36","margin":"0 auto", "display":"block"}
         ),
     html.Div(id='my-output',style={'text-align': 'center'}),
-    html.Div(id="textarea-state-example-output", style={"whiteSpace": "pre-line"}),
+    html.Div(id="textarea-state-example-output", style={"whiteSpace": "pre-line"})
 ])
-
-
-app = dash.Dash(__name__)
 
 
 ################################################################################
@@ -65,14 +64,13 @@ app = dash.Dash(__name__)
 )
 
 
-
-def update_output_div(n_clicks, input_value):
-    with open('tokenizer.pickle', 'rb') as handle:
-        tokenizer = pickle.load(handle)
-    with open('MODEL.pickle', 'rb') as handle:
-        model = pickle.load(handle)
+def update_output(n_clicks, input_value):
     if n_clicks > 0:
-        sequences_y = tokenizer.texts_to_sequences([input_value])
+        with open('./models/tokenizer.pickle', 'rb') as handle:
+            tokenizer = pickle.load(handle)
+        with open('./models/model.pickle', 'rb') as handle:
+            model = pickle.load(handle)
+        sequences_y = tokenizer.texts_to_sequences(input_value)
         data_y = pad_sequences(sequences_y, padding = 'post')
         y_hat = model.predict(data_y)
         if y_hat[0][0]>=0.8:
