@@ -1,4 +1,3 @@
-matplotlib
 numpy
 pandas
 scikit-learn
@@ -8,3 +7,10 @@ demoji
 nltk
 pyspellchecker
 wordsegment
+matplotlib==3.5.2
+seaborn==0.11.2
+dash==2.3.1
+gunicorn==20.1.0
+dash_bootstrap_components
+pickle
+tensorflow

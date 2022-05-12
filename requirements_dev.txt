@@ -10,3 +10,5 @@ testbook==0.4.2
 mlflow==1.20.2
 parsenvy==3.0.2
 black==21.9b0
+dash==2.3.1
+gunicorn==20.1.0
