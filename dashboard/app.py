@@ -1,13 +1,12 @@
 import dash
 from dash import dcc
 from dash import html
-import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 import pickle
 #import tensorflow as tf
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+#from tensorflow.keras.preprocessing.sequence import pad_sequences
 import dash_bootstrap_components as dbc
-import os
+from PIL import Image
 
 ################################################################################
 # APP INITIALIZATION
@@ -17,9 +16,12 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO]) # Superhe
 # this is needed by gunicorn command in procfile
 server = app.server
 
+
 ################################################################################
-# PLOTS
+# image
 ################################################################################
+#pyLogo = Image.open("logo.png")
+# Create figure
 
 
 
@@ -38,20 +40,23 @@ app.layout = html.Div([
         dcc.Textarea(
             id="my-input",
             value="",
-            style={"width": "100%", "height": 100, "background-color":'#ADD8E6'},
+            style={"width": "80%", "height": 100, "background-color":'#ADD8E6',"margin":"0 auto", "display":"block"},
         ),
     html.Br(),
     html.Button(
         "Detect Toxicity", 
         id="submit-button-state", 
         n_clicks=0,
-        style={"background-color":"#FF5A36","margin":"0 auto", "display":"block"}
+        style={"background-color":"#FF5A36","margin":"0 auto", "display":"block", 'padding': 10}
         ),
-    html.Div(id='my-output',style={'text-align': 'center'}),
-    html.Div(id="textarea-state-example-output", style={"whiteSpace": "pre-line"})
+    html.Div(id='my-output',style={'text-align': 'center', 'padding': 100}),
+    html.Div(id="textarea-state-example-output", style={"whiteSpace": "pre-line"}),
+    # html.Img(src=pyLogo, width="500", height="120",
+    #             style={
+    #             "position": "absolute", "bottom":"3px", "right":"3px", "padding-right": "20px"}) 
 ])
 
-
+#"position": "relative", "float": "right", "padding-right": "20px"
 ################################################################################
 # INTERACTION CALLBACKS
 ################################################################################
@@ -66,19 +71,21 @@ app.layout = html.Div([
 
 def update_output(n_clicks, input_value):
     if n_clicks > 0:
-        with open('./models/tokenizer.pickle', 'rb') as handle:
-            tokenizer = pickle.load(handle)
-        with open('./models/model.pickle', 'rb') as handle:
-            model = pickle.load(handle)
-        sequences_y = tokenizer.texts_to_sequences(input_value)
-        data_y = pad_sequences(sequences_y, padding = 'post')
-        y_hat = model.predict(data_y)
-        if y_hat[0][0]>=0.8:
-            output_value = "The text is toxic!"
-        else:
-            output_value = "No toxicity detected."
-        return output_value
 
+        # with open('./models/tokenizer.pickle', 'rb') as handle:
+        #     tokenizer = pickle.load(handle)
+        # with open('./models/model.pickle', 'rb') as handle:
+        #     model = pickle.load(handle)
+        
+        #sequences_y = tokenizer.texts_to_sequences([input_value])
+        #data_y = pad_sequences(sequences_y, padding = 'post', maxlen = 200)
+        #y_hat = model.predict(data_y)
+        # if y_hat[0][0]>=0.5:
+        #     output_value = "The text is toxic!"
+        # else:
+        #     output_value = "No toxicity detected."
+        # print(y_hat[0][0])
+        return 'hello' #output_value
 
 # Add the server clause:
 if __name__ == "__main__":
