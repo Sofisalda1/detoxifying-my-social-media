@@ -20,11 +20,7 @@ server = app.server
 ################################################################################
 # image
 ################################################################################
-#pyLogo = Image.open("logo.png")
-# Create figure
-
-
-
+pyLogo = Image.open("logo.png")
 # ################################################################################
 # # LAYOUT
 # ################################################################################
@@ -49,43 +45,51 @@ app.layout = html.Div([
         n_clicks=0,
         style={"background-color":"#FF5A36","margin":"0 auto", "display":"block", 'padding': 10}
         ),
-    html.Div(id='my-output',style={'text-align': 'center', 'padding': 100}),
+    html.Br(),
+    html.Button('Reset',id='reset_button', n_clicks=0, style={"margin":"0 auto","background-color":"#FF5A36","margin":"0 auto", "display":"block"}),
+    html.Div(id='my-output',style={'text-align': 'center', 'padding': 20}),
     html.Div(id="textarea-state-example-output", style={"whiteSpace": "pre-line"}),
-    # html.Img(src=pyLogo, width="500", height="120",
-    #             style={
-    #             "position": "absolute", "bottom":"3px", "right":"3px", "padding-right": "20px"}) 
+    html.Div(html.Img(id='my-iimage',style={'margin': 'auto', 'display': 'block', "border": "0",  "background":None}, width=300, height=200)),
+    html.Img(src=pyLogo, width="500", height="120",
+                style={
+                "position": "absolute", "bottom":"3px", "right":"3px", "padding-right": "20px"}) 
 ])
 
-#"position": "relative", "float": "right", "padding-right": "20px"
 ################################################################################
 # INTERACTION CALLBACKS
 ################################################################################
 # https://dash.plotly.com/basic-callbacks
 
 @app.callback(
-    Output(component_id='my-output', component_property='children'),
+    Output('my-iimage', 'src'),
     Input("submit-button-state", "n_clicks"),
-    State(component_id='my-input', component_property='value'),
-)
+    State(component_id='my-input', component_property='value')
+    )
 
-
-def update_output(n_clicks, input_value):
+def update_image(n_clicks, input_value):
     if n_clicks > 0:
+#         # with open('./models/tokenizer.pickle', 'rb') as handle:
+#         #     tokenizer = pickle.load(handle)
+#         # with open('./models/model.pickle', 'rb') as handle:
+#         #     model = pickle.load(handle)
+#         #sequences_y = tokenizer.texts_to_sequences([input_value])
+#         #data_y = pad_sequences(sequences_y, padding = 'post', maxlen = 200)
+#         #y_hat = model.predict(data_y)
+#         # if y_hat[0][0]>=0.5:
+#         #     img = 'https://media.giphy.com/media/3o6MbqwVaVfbxMJTTq/giphy.gif'
+#         # else:
+#         #     img = "https://media.giphy.com/media/xT8qAYITi1l7A6m5eo/giphy.gif"
+        img = 'https://media.giphy.com/media/3o6MbqwVaVfbxMJTTq/giphy.gif'
+    else:
+        img = "https://media.giphy.com/media/26BoDGStUAafwdZII/giphy.gif"
+    return img
 
-        # with open('./models/tokenizer.pickle', 'rb') as handle:
-        #     tokenizer = pickle.load(handle)
-        # with open('./models/model.pickle', 'rb') as handle:
-        #     model = pickle.load(handle)
-        
-        #sequences_y = tokenizer.texts_to_sequences([input_value])
-        #data_y = pad_sequences(sequences_y, padding = 'post', maxlen = 200)
-        #y_hat = model.predict(data_y)
-        # if y_hat[0][0]>=0.5:
-        #     output_value = "The text is toxic!"
-        # else:
-        #     output_value = "No toxicity detected."
-        # print(y_hat[0][0])
-        return 'hello' #output_value
+
+@app.callback(Output('submit-button-state','n_clicks'),
+             [Input('reset_button','n_clicks')],
+             State(component_id='my-input', component_property='value'))
+def update(reset,input_value):
+    return 0
 
 # Add the server clause:
 if __name__ == "__main__":

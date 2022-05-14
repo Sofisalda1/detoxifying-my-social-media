@@ -2,4 +2,4 @@ dash
 scikit-learn
 gunicorn
 dash_bootstrap_components
-PIL
+Pillow
