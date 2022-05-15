@@ -72,20 +72,20 @@ app.layout = html.Div([
 def update_output(n_clicks, input_value):
     if n_clicks > 0:
 
-        # with open('./models/tokenizer.pickle', 'rb') as handle:
-        #     tokenizer = pickle.load(handle)
-        # with open('./models/model.pickle', 'rb') as handle:
-        #     model = pickle.load(handle)
+        with open('./models/vect.pickle', 'rb') as handle:
+            vect = pickle.load(handle)
+        with open('./models/modelLR.pickle', 'rb') as handle:
+            modelLR = pickle.load(handle)
         
-        #sequences_y = tokenizer.texts_to_sequences([input_value])
-        #data_y = pad_sequences(sequences_y, padding = 'post', maxlen = 200)
-        #y_hat = model.predict(data_y)
-        # if y_hat[0][0]>=0.5:
-        #     output_value = "The text is toxic!"
-        # else:
-        #     output_value = "No toxicity detected."
-        # print(y_hat[0][0])
-        return 'hello' #output_value
+        sequences_y = vect.texts_to_sequences([input_value])
+        data_y = pad_sequences(sequences_y, padding = 'post', maxlen = 200)
+        y_hat = modelLR.predict(data_y)
+        if y_hat[0][0]>=0.5:
+            output_value = "The text is toxic!"
+        else:
+            output_value = "No toxicity detected."
+        print(y_hat[0][0])
+        return output_value
 
 # Add the server clause:
 if __name__ == "__main__":
