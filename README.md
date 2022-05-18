@@ -3,7 +3,7 @@ The anonymity on the internet allows people to use a more toxic tone when intera
 
 
 ## The Data
-The data were extracted from kaggle () and and are governed by Wikipedia's CC-SA-3.0. The text data consist of Wikipedia comments which have been labeled by human raters for toxic behavior. The following columns are contained in the data
+The data were extracted from kaggle (https://www.kaggle.com/competitions/jigsaw-toxic-comment-classification-challenge/data) and and are governed by Wikipedia's CC-SA-3.0. The text data consist of Wikipedia comments which have been labeled by human raters for toxic behavior. The following columns are contained in the data
 
 comment_text: The text comment extracted from wikipedia.
 toxic: the rating as toxic (1 for toxic and 0 for not toxic).
