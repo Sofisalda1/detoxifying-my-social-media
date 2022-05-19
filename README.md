@@ -15,7 +15,9 @@ test.csv - the test set.
 ## Prediction
 1. Explorative Data Analysis
 2. Modelfitting
-3. Dashboard
+3. App: 
+   Predict new comments on the app https://detoxifysocialmedia.herokuapp.com/
+   Enter a new comment, press detoxify and wait for the results.
 
 
 
